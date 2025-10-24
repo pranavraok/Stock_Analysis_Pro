@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Analysis Pro</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<!-- Animated Background -->
+<div class="background-wrapper">
+<div class="gradient-orb orb-1"></div>
+<div class="gradient-orb orb-2"></div>
+<div class="gradient-orb orb-3"></div>
+<div class="grid-overlay"></div>
+</div>
+
+<div class="container">
+<!-- Main Input Page -->
+<div id="inputPage" class="page active">
+<div class="hero-section">
+<div class="logo-container">
+<div class="logo-wrapper">
+<svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#gradient1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M2 17L12 22L22 17" stroke="url(#gradient1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M2 12L12 17L22 12" stroke="url(#gradient1)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<defs>
+<linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+</linearGradient>
+</defs>
+</svg>
+<div class="logo-glow"></div>
+</div>
+<div class="title-wrapper">
+<h1 class="title">Stock Analysis <span class="gradient-text">Pro</span></h1>
+<div class="title-underline"></div>
+</div>
+</div>
+<p class="subtitle">AI-Powered Market Intelligence & Investment Insights</p>
+<div class="badge-container">
+<span class="badge pulse-badge">
+<span class="pulse-dot"></span>
+Real-time Analysis
+</span>
+<span class="badge">Professional Reports</span>
+</div>
+</div>
+
+<div class="glass-card input-card">
+<div class="card-glow"></div>
+<div class="input-wrapper">
+<svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<input type="text" id="stockInput" class="stock-input" placeholder="Enter stock symbol (e.g., RELIANCE, TCS, INFY)" autofocus>
+<div class="input-highlight"></div>
+</div>
+<button id="analyzeBtn" class="analyze-btn magnetic-btn">
+<span class="btn-content">
+<span class="btn-text">Analyze Stock</span>
+<svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 7L18 12M18 12L13 17M18 12H6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</span>
+<div class="btn-shimmer"></div>
+<div class="btn-particles">
+<span class="particle"></span>
+<span class="particle"></span>
+<span class="particle"></span>
+</div>
+</button>
+</div>
+
+<!-- Loading Page -->
+<div id="loadingPage" class="page">
+<div class="glass-card loading-card">
+<div class="loading-content">
+<div class="loader-wrapper">
+<svg class="circular-loader" viewBox="0 0 100 100">
+<defs>
+<linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+<stop offset="50%" style="stop-color:#ec4899;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+</linearGradient>
+</defs>
+ircle class="loader-bg" cx="50" cy="5050" r="45" />
+ircle class="loader-progress" cx="50" cy="50" r="45" strokeke="url(#gradient2)" />
+</svg>
+<div class="loader-percentage" id="loaderPercentage">0%</div>
+</div>
+<h2 class="loading-title">
+<span class="loading-emoji">🚀</span>
+Analyzing Market Data
+</h2>
+<p class="loading-text" id="loadingText">Initializing analysis engine...</p>
+<div class="progress-bar-container">
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+<div class="progress-glow"></div>
+</div>
+</div>
+<div class="loading-steps-modern">
+<div class="step-modern" id="step1">
+<div class="step-circle">
+<svg class="step-checkmark" viewBox="0 0 24 24" fill="none">
+<path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<span class="step-text">Data Collection</span>
+</div>
+<div class="step-modern" id="step2">
+<div class="step-circle">
+<svg class="step-checkmark" viewBox="0 0 24 24" fill="none">
+<path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<span class="step-text">Pattern Analysis</span>
+</div>
+<div class="step-modern" id="step3">
+<div class="step-circle">
+<svg class="step-checkmark" viewBox="0 0 24 24" fill="none">
+<path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<span class="step-text">Report Generation</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Results Page -->
+<div id="resultsPage" class="page">
+<div class="results-content">
+<!-- Success Animation -->
+<div class="success-wrapper">
+<div class="success-ripple"></div>
+<div class="success-circle">
+<svg class="success-checkmark" viewBox="0 0 52 52">
+ircle class="checkmark-circle" cx="26" cy="26" r="25"5" fill="none"/>
+<path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+</svg>
+</div>
+<div class="success-particles">
+<span class="success-particle"></span>
+<span class="success-particle"></span>
+<span class="success-particle"></span>
+<span class="success-particle"></span>
+</div>
+</div>
+
+<h1 class="success-title">
+<span class="title-gradient">Analysis Complete!</span>
+<span class="title-sparkle">✨</span>
+</h1>
+<p class="success-subtitle">Your comprehensive market intelligence report is ready</p>
+
+<!-- Stock Info Card with Glassmorphism -->
+<div class="glass-card stock-card">
+<div class="stock-card-bg"></div>
+<div class="stock-info-grid">
+<div class="stock-main">
+<div class="stock-symbol" id="stockSymbol">RELIANCE</div>
+<div class="company-name" id="companyName">Reliance Industries Limited</div>
+</div>
+<div class="stock-live-badge">
+<span class="live-dot"></span>
+<span>Live</span>
+</div>
+</div>
+</div>
+
+<!-- Modern Summary Cards -->
+<div class="summary-grid">
+<div class="glass-card summary-card verdict-card">
+<div class="card-header">
+<div class="card-icon">🎯</div>
+<span class="card-label">Verdict</span>
+</div>
+<div class="card-value-wrapper">
+<div class="verdict-value" id="verdictValue">STRONG BUY</div>
+<div class="verdict-badge" id="verdictBadge">Bullish</div>
+</div>
+<div class="card-footer">
+<svg class="trend-icon" viewBox="0 0 24 24" fill="none">
+<path d="M13 7L18 12L13 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+<path d="M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+<span>High Confidence</span>
+</div>
+</div>
+
+<div class="glass-card summary-card confidence-card">
+<div class="card-header">
+<div class="card-icon">⚡</div>
+<span class="card-label">Confidence Score</span>
+</div>
+<div class="confidence-meter">
+<svg class="confidence-ring" viewBox="0 0 100 100">
+ircle class="ring-bg" cx="50" cy="5050" r="40" />
+ircle class="ring-progress" id="confidenceRing" cx="50" cy="="50" r="40" />
+</svg>
+<div class="confidence-percentage" id="confidenceValue">85%</div>
+</div>
+<div class="card-footer">
+<span>AI-Powered Analysis</span>
+</div>
+</div>
+
+<div class="glass-card summary-card price-card">
+<div class="card-header">
+<div class="card-icon">💰</div>
+<span class="card-label">Current Price</span>
+</div>
+<div class="price-value" id="priceValue">₹2,450.00</div>
+<div class="price-change" id="priceChange">
+<svg class="change-icon" viewBox="0 0 24 24" fill="none">
+<path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span>+2.5% Today</span>
+</div>
+</div>
+</div>
+
+<!-- Download Section with 3D Effect -->
+<div class="glass-card download-card">
+<div class="download-decoration"></div>
+<button id="downloadBtn" class="download-btn magnetic-btn">
+<div class="btn-layers">
+<span class="btn-layer"></span>
+<span class="btn-layer"></span>
+<span class="btn-layer"></span>
+</div>
+<span class="btn-content">
+<svg class="download-icon" viewBox="0 0 24 24" fill="none">
+<path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span class="btn-text">Download Complete Report</span>
+</span>
+<div class="btn-shimmer"></div>
+</button>
+<div class="download-info">
+<div class="info-item">
+<svg viewBox="0 0 24 24" fill="none">
+<path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+</svg>
+<span>PDF Format • 450-500 KB</span>
+</div>
+<div class="info-item">
+<svg viewBox="0 0 24 24" fill="none">
+<path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2"/>
+</svg>
+<span>Generated Just Now</span>
+</div>
+</div>
+</div>
+
+<!-- New Analysis Button -->
+<button id="newAnalysisBtn" class="new-analysis-btn glass-card">
+<svg class="btn-icon-plus" viewBox="0 0 24 24" fill="none">
+<path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+<span>Analyze Another Stock</span>
+<div class="btn-hover-effect"></div>
+</button>
+</div>
+</div>
+
+<!-- Modern Toast Notification -->
+<div id="errorToast" class="toast glass-card">
+<div class="toast-icon-wrapper error">
+<svg class="toast-icon" viewBox="0 0 24 24" fill="none">
+<path d="M12 8V12M12 16H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div>
+<div class="toast-content">
+<span class="toast-title">Error</span>
+<span class="toast-message" id="errorMessage">An error occurred</span>
+</div>
+<button class="toast-close" onclick="document.getElementById('errorToast').classList.remove('show')">
+<svg viewBox="0 0 24 24" fill="none">
+<path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</button>
+<div class="toast-progress"></div>
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
