@@ -1,0 +1,16 @@
+# Web Framework
+Flask==3.1.0
+Werkzeug==3.1.3
+
+# Data Analysis & Manipulation
+pandas==2.2.3
+numpy==2.1.3
+
+# Stock Market Data
+yfinance==0.2.66
+
+# PDF Generation
+fpdf2==2.8.4
+
+# Data Visualization
+matplotlib==3.9.2
