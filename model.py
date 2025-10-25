@@ -241,7 +241,13 @@ class EnhancedStockAnalyzer:
         self.rsi = None
         self.analysis_results = {}
         
-        print(f"\nAnalyzing {self.stock_name}...")
+        # IMPORTANT: Use /tmp directory for Vercel
+        self.temp_dir = '/tmp'
+        os.makedirs(self.temp_dir, exist_ok=True)
+        
+        print(f"\n{'='*70}")
+        print(f"Initializing analysis for {self.stock_name}...")
+        print(f"{'='*70}\n")
     
     def fetch_data(self):
         try:
@@ -721,7 +727,7 @@ class EnhancedStockAnalyzer:
         try:
             print("Creating professional charts...")
             
-            # RSI Chart
+            # RSI Chart - Save to /tmp
             if self.rsi is not None and not self.rsi.empty:
                 fig, ax = plt.subplots(figsize=(14, 7))
                 fig.patch.set_facecolor('white')
@@ -756,10 +762,13 @@ class EnhancedStockAnalyzer:
                            fontsize=11, fontweight='bold', color='white')
                 
                 plt.tight_layout()
-                plt.savefig('/tmp/rsi_chart.png', dpi=300, bbox_inches='tight', facecolor='white')
+                # SAVE TO /tmp INSTEAD OF CURRENT DIRECTORY
+                rsi_chart_path = os.path.join(self.temp_dir, 'rsi_chart.png')
+                plt.savefig(rsi_chart_path, dpi=300, bbox_inches='tight', facecolor='white')
                 plt.close()
+                print(f"✓ RSI Chart saved to {rsi_chart_path}")
             
-            # Fundamentals Chart
+            # Fundamentals Chart - Save to /tmp
             fund_data = self.analysis_results.get('fundamentals_analysis', {})
             if fund_data.get('revenue_list') and fund_data.get('dates') and len(fund_data['revenue_list']) > 0:
                 revenue_list = fund_data['revenue_list']
@@ -782,17 +791,20 @@ class EnhancedStockAnalyzer:
                 bars2 = ax.bar([i for i in x], operating_profit_crores, width, label='Operating Profit', color='#F39C12', alpha=0.9, edgecolor='black', linewidth=1.5)
                 bars3 = ax.bar([i + width for i in x], net_profit_crores, width, label='Net Profit', color='#27AE60', alpha=0.9, edgecolor='black', linewidth=1.5)
                 
-                ax.set_title('Quarterly Financial Performance (Crores)', fontsize=16, fontweight='bold', pad=20)
+                ax.set_title('Quarterly Financial Performance (₹ Crores)', fontsize=16, fontweight='bold', pad=20)
                 ax.set_xlabel('Quarter', fontsize=12, fontweight='bold')
-                ax.set_ylabel('Amount (Crores)', fontsize=12, fontweight='bold')
+                ax.set_ylabel('Amount (₹ Crores)', fontsize=12, fontweight='bold')
                 ax.set_xticks(x)
                 ax.set_xticklabels(dates, fontsize=11, fontweight='bold')
                 ax.legend(fontsize=11, loc='best')
                 ax.grid(True, alpha=0.3, axis='y', linestyle=':')
                 
                 plt.tight_layout()
-                plt.savefig('/tmp/fundamentals_chart.png', dpi=300, bbox_inches='tight', facecolor='white')
+                # SAVE TO /tmp INSTEAD OF CURRENT DIRECTORY
+                fund_chart_path = os.path.join(self.temp_dir, 'fundamentals_chart.png')
+                plt.savefig(fund_chart_path, dpi=300, bbox_inches='tight', facecolor='white')
                 plt.close()
+                print(f"✓ Fundamentals Chart saved to {fund_chart_path}")
             
             print("All charts created successfully")
             return True
@@ -957,9 +969,11 @@ class EnhancedStockAnalyzer:
             
             pdf.ln(5)
             
-            if os.path.exists('rsi_chart.png'):
+            # Use /tmp path for RSI chart
+            rsi_chart_path = os.path.join(self.temp_dir, 'rsi_chart.png')
+            if os.path.exists(rsi_chart_path):
                 pdf.check_page_space(100)
-                pdf.image('rsi_chart.png', x=15, y=pdf.get_y(), w=180)
+                pdf.image(rsi_chart_path, x=15, y=pdf.get_y(), w=180)
             
             # PAGE 4: VALUATION ANALYSIS
             pdf.add_page()
@@ -998,9 +1012,11 @@ class EnhancedStockAnalyzer:
             
             pdf.ln(5)
             
-            if os.path.exists('fundamentals_chart.png'):
+            # Use /tmp path for fundamentals chart
+            fund_chart_path = os.path.join(self.temp_dir, 'fundamentals_chart.png')
+            if os.path.exists(fund_chart_path):
                 pdf.check_page_space(100)
-                pdf.image('fundamentals_chart.png', x=15, y=pdf.get_y(), w=180)
+                pdf.image(fund_chart_path, x=15, y=pdf.get_y(), w=180)
             
             # PAGE 5: FINAL VERDICT
             pdf.add_page()
@@ -1121,10 +1137,12 @@ class EnhancedStockAnalyzer:
             pdf.set_text_color(*pdf.TEXT_LIGHT)
             pdf.cell(0, 5, f"Report Generated: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", 0, 1, "C")
             
-            pdf_filename = f"/tmp/Stock_Analysis_{stock_ticker}_{datetime.now().strftime('%d%m%Y')}.pdf"
+            # Save PDF to /tmp directory - CRITICAL FIX
+            pdf_filename = os.path.join(self.temp_dir, 
+                                       f"Stock_Analysis_{stock_ticker}_{datetime.now().strftime('%d%m%Y')}.pdf")
             pdf.output(pdf_filename)
+            print(f"✓ PDF Report generated: {pdf_filename}")
             
-            print(f"PDF Report generated: {pdf_filename}")
             return pdf_filename
         except Exception as e:
             print(f"PDF generation error: {e}")
@@ -1133,10 +1151,18 @@ class EnhancedStockAnalyzer:
             return None
     
     def cleanup_files(self):
+        """Clean up temporary chart files"""
         try:
-            for file in ['/tmp/rsi_chart.png', '/tmp/fundamentals_chart.png']:
+            chart_files = [
+                os.path.join(self.temp_dir, 'rsi_chart.png'),
+                os.path.join(self.temp_dir, 'fundamentals_chart.png')
+            ]
+            
+            for file in chart_files:
                 if os.path.exists(file):
                     os.remove(file)
+                    print(f"✓ Cleaned up: {file}")
+            
             print("Temporary files cleaned up")
         except Exception as e:
             print(f"Cleanup warning: {e}")

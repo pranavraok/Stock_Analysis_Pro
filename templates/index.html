@@ -74,6 +74,7 @@ Real-time Analysis
 </div>
 </button>
 </div>
+</div>
 
 <!-- Loading Page -->
 <div id="loadingPage" class="page">
@@ -88,8 +89,8 @@ Real-time Analysis
 <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
 </linearGradient>
 </defs>
-ircle class="loader-bg" cx="50" cy="5050" r="45" />
-ircle class="loader-progress" cx="50" cy="50" r="45" strokeke="url(#gradient2)" />
+<circle class="loader-bg" cx="50" cy="50" r="45" />
+<circle class="loader-progress" cx="50" cy="50" r="45" stroke="url(#gradient2)" />
 </svg>
 <div class="loader-percentage" id="loaderPercentage">0%</div>
 </div>
@@ -142,7 +143,7 @@ Analyzing Market Data
 <div class="success-ripple"></div>
 <div class="success-circle">
 <svg class="success-checkmark" viewBox="0 0 52 52">
-ircle class="checkmark-circle" cx="26" cy="26" r="25"5" fill="none"/>
+<circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
 <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
 </svg>
 </div>
@@ -202,8 +203,14 @@ ircle class="checkmark-circle" cx="26" cy="26" r="25"5" fill="none"/>
 </div>
 <div class="confidence-meter">
 <svg class="confidence-ring" viewBox="0 0 100 100">
-ircle class="ring-bg" cx="50" cy="5050" r="40" />
-ircle class="ring-progress" id="confidenceRing" cx="50" cy="="50" r="40" />
+<defs>
+<linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+</linearGradient>
+</defs>
+<circle class="ring-bg" cx="50" cy="50" r="40" />
+<circle class="ring-progress" id="confidenceRing" cx="50" cy="50" r="40" stroke="url(#gradient3)" />
 </svg>
 <div class="confidence-percentage" id="confidenceValue">85%</div>
 </div>
@@ -272,6 +279,7 @@ ircle class="ring-progress" id="confidenceRing" cx="50" cy="="50" r="40" />
 </button>
 </div>
 </div>
+</div>
 
 <!-- Modern Toast Notification -->
 <div id="errorToast" class="toast glass-card">
@@ -290,7 +298,6 @@ ircle class="ring-progress" id="confidenceRing" cx="50" cy="="50" r="40" />
 </svg>
 </button>
 <div class="toast-progress"></div>
-</div>
 </div>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>

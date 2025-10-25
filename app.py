@@ -45,7 +45,7 @@ def analyze_stock():
         pdf_path = analyzer.run_complete_analysis()
         
         if pdf_path and os.path.exists(pdf_path):
-            # Move PDF to /tmp folder if it's not already there
+            # Ensure PDF is in /tmp folder
             if not pdf_path.startswith(TEMP_DIR):
                 new_path = os.path.join(TEMP_DIR, os.path.basename(pdf_path))
                 if os.path.exists(pdf_path):
