@@ -756,7 +756,7 @@ class EnhancedStockAnalyzer:
                            fontsize=11, fontweight='bold', color='white')
                 
                 plt.tight_layout()
-                plt.savefig('rsi_chart.png', dpi=300, bbox_inches='tight', facecolor='white')
+                plt.savefig('/tmp/rsi_chart.png', dpi=300, bbox_inches='tight', facecolor='white')
                 plt.close()
             
             # Fundamentals Chart
@@ -791,7 +791,7 @@ class EnhancedStockAnalyzer:
                 ax.grid(True, alpha=0.3, axis='y', linestyle=':')
                 
                 plt.tight_layout()
-                plt.savefig('fundamentals_chart.png', dpi=300, bbox_inches='tight', facecolor='white')
+                plt.savefig('/tmp/fundamentals_chart.png', dpi=300, bbox_inches='tight', facecolor='white')
                 plt.close()
             
             print("All charts created successfully")
@@ -1121,7 +1121,7 @@ class EnhancedStockAnalyzer:
             pdf.set_text_color(*pdf.TEXT_LIGHT)
             pdf.cell(0, 5, f"Report Generated: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", 0, 1, "C")
             
-            pdf_filename = f"Stock_Analysis_{stock_ticker}_{datetime.now().strftime('%d%m%Y')}.pdf"
+            pdf_filename = f"/tmp/Stock_Analysis_{stock_ticker}_{datetime.now().strftime('%d%m%Y')}.pdf"
             pdf.output(pdf_filename)
             
             print(f"PDF Report generated: {pdf_filename}")
@@ -1133,9 +1133,8 @@ class EnhancedStockAnalyzer:
             return None
     
     def cleanup_files(self):
-        """Clean up temporary chart files"""
         try:
-            for file in ['rsi_chart.png', 'fundamentals_chart.png']:
+            for file in ['/tmp/rsi_chart.png', '/tmp/fundamentals_chart.png']:
                 if os.path.exists(file):
                     os.remove(file)
             print("Temporary files cleaned up")
