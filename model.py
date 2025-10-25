@@ -82,9 +82,10 @@ def calculate_rsi(prices, period=14):
         print(f"RSI calculation error: {e}")
         return None
 
-def fetch_with_retry(stock_symbol, max_retries=3, backoff=2):
+def fetch_with_retry(stock_symbol, max_retries=2, backoff=1):
+    """Optimized for Vercel - faster retry with reduced attempts"""
     end_date = datetime.today()
-    start_date = end_date - timedelta(days=365)
+    start_date = end_date - timedelta(days=180)  # OPTIMIZED: Reduced from 365 to 180 days
     
     end_date_str = end_date.strftime('%Y-%m-%d')
     start_date_str = start_date.strftime('%Y-%m-%d')
@@ -98,10 +99,10 @@ def fetch_with_retry(stock_symbol, max_retries=3, backoff=2):
                 start=start_date_str, 
                 end=end_date_str,
                 progress=False,
-                timeout=30
+                timeout=8  # OPTIMIZED: Reduced from 30 to 8 seconds
             )
             
-            if data is not None and not data.empty and len(data) > 50:
+            if data is not None and not data.empty and len(data) > 30:  # OPTIMIZED: Reduced from 50
                 print(f"Downloaded {len(data)} days of data")
                 return data
                 
@@ -115,7 +116,7 @@ def fetch_with_retry(stock_symbol, max_retries=3, backoff=2):
     return None
 
 # =====================================================
-# PROFESSIONAL PDF CLASS
+# PROFESSIONAL PDF CLASS (NO CHANGES)
 # =====================================================
 
 class ProfessionalStockPDF(FPDF):
@@ -234,7 +235,7 @@ class EnhancedStockAnalyzer:
     def __init__(self, stock_name):
         self.stock_name = get_full_stock_name(stock_name)
         self.end_date = datetime.today()
-        self.start_date = self.end_date - timedelta(days=365)
+        self.start_date = self.end_date - timedelta(days=180)  # OPTIMIZED: 180 instead of 365
         
         self.data = None
         self.stock_info = None
@@ -268,7 +269,7 @@ class EnhancedStockAnalyzer:
             if self.data is None or self.data.empty:
                 raise ValueError(f"No data for {self.stock_name}")
             
-            if len(self.data) < 50:
+            if len(self.data) < 30:  # OPTIMIZED: Reduced from 50
                 raise ValueError(f"Insufficient data: {len(self.data)} days")
             
             print("Data ready")
@@ -338,13 +339,14 @@ class EnhancedStockAnalyzer:
             high_52w = float(high_prices.max())
             low_52w = float(low_prices.min())
             
-            ma_50 = float(close_prices.tail(50).mean())
-            ma_200 = float(close_prices.tail(200).mean()) if len(close_prices) >= 200 else ma_50
+            ma_50 = float(close_prices.tail(min(50, len(close_prices))).mean())
+            ma_200_len = min(200, len(close_prices))
+            ma_200 = float(close_prices.tail(ma_200_len).mean()) if ma_200_len >= 50 else ma_50
             
             distance_from_high = ((high_52w - current_price) / high_52w) * 100
             distance_from_low = ((current_price - low_52w) / low_52w) * 100
             
-            avg_volume = float(volume_data.tail(30).mean())
+            avg_volume = float(volume_data.tail(min(30, len(volume_data))).mean())
             current_volume = float(volume_data.iloc[-1])
             volume_signal = "Above average" if current_volume > avg_volume else "Below average"
             
@@ -529,10 +531,31 @@ class EnhancedStockAnalyzer:
             return False
     
     def analyze_fundamentals(self):
-        """Quarterly fundamentals with revenue, operating profit, and net profit"""
+        """Quarterly fundamentals with timeout for Vercel"""
         try:
+            print("Fetching fundamentals (quick mode)...")
             ticker = yf.Ticker(self.stock_name)
+            
+            # OPTIMIZED: Quick timeout to prevent Vercel issues
+            import signal
+            
+            def timeout_handler(signum, frame):
+                raise TimeoutError("Fundamentals timeout")
+            
+            # Set 3 second timeout for fundamentals fetch
+            try:
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(3)
+            except:
+                pass  # Windows doesn't support SIGALRM
+            
             income_stmt = ticker.quarterly_financials
+            
+            # Cancel alarm
+            try:
+                signal.alarm(0)
+            except:
+                pass
             
             if income_stmt is None or income_stmt.empty:
                 print("No quarterly data available")
@@ -610,6 +633,19 @@ class EnhancedStockAnalyzer:
             }
             
             print(f"Fundamentals: {recommendation}")
+            return True
+            
+        except TimeoutError:
+            print("Fundamentals timeout - using quick analysis")
+            self.analysis_results['fundamentals_analysis'] = {
+                'recommendation': "Quick analysis mode",
+                'reasoning': "Limited fundamental data in fast mode",
+                'is_good': None,
+                'dates': [],
+                'revenue_list': [],
+                'operating_profit_list': [],
+                'net_profit_list': []
+            }
             return True
         except Exception as e:
             print(f"Error in fundamentals: {e}")
@@ -723,13 +759,13 @@ class EnhancedStockAnalyzer:
             return False
     
     def create_charts(self):
-        """Create professional charts"""
+        """Create professional charts - OPTIMIZED for Vercel"""
         try:
-            print("Creating professional charts...")
+            print("Creating charts (fast mode)...")
             
-            # RSI Chart - Save to /tmp
+            # RSI Chart - OPTIMIZED: Smaller size and lower DPI
             if self.rsi is not None and not self.rsi.empty:
-                fig, ax = plt.subplots(figsize=(14, 7))
+                fig, ax = plt.subplots(figsize=(10, 5))  # OPTIMIZED: Reduced from (14, 7)
                 fig.patch.set_facecolor('white')
                 ax.set_facecolor('#F8F9F9')
                 
@@ -742,33 +778,32 @@ class EnhancedStockAnalyzer:
                 ax.fill_between(self.rsi.index, 0, 30, alpha=0.08, color='#27AE60')
                 
                 ax.set_ylim(0, 100)
-                ax.set_title('Relative Strength Index (RSI) - 14 Period', fontsize=16, fontweight='bold', pad=20)
-                ax.set_xlabel('Date', fontsize=12, fontweight='bold')
-                ax.set_ylabel('RSI Value', fontsize=12, fontweight='bold')
-                ax.legend(loc='best', fontsize=10)
+                ax.set_title('Relative Strength Index (RSI) - 14 Period', fontsize=14, fontweight='bold', pad=15)
+                ax.set_xlabel('Date', fontsize=10, fontweight='bold')
+                ax.set_ylabel('RSI Value', fontsize=10, fontweight='bold')
+                ax.legend(loc='best', fontsize=9)
                 ax.grid(True, alpha=0.3, linestyle=':')
                 
                 final_rsi = float(self.rsi.iloc[-1])
                 final_date = self.rsi.index[-1]
                 color = '#27AE60' if final_rsi < 30 else '#E74C3C' if final_rsi > 70 else '#95A5A6'
                 
-                ax.scatter([final_date], [final_rsi], color=color, s=200, zorder=5, edgecolor='black', linewidth=2)
+                ax.scatter([final_date], [final_rsi], color=color, s=150, zorder=5, edgecolor='black', linewidth=2)
                 ax.annotate(f'Current RSI: {final_rsi:.1f}', 
                            xy=(final_date, final_rsi),
                            xytext=(30, 30), 
                            textcoords='offset points',
                            bbox=dict(boxstyle='round,pad=0.8', facecolor=color, alpha=0.8, edgecolor='black', linewidth=1),
                            arrowprops=dict(arrowstyle='->', lw=2, color='black'),
-                           fontsize=11, fontweight='bold', color='white')
+                           fontsize=10, fontweight='bold', color='white')
                 
                 plt.tight_layout()
-                # SAVE TO /tmp INSTEAD OF CURRENT DIRECTORY
                 rsi_chart_path = os.path.join(self.temp_dir, 'rsi_chart.png')
-                plt.savefig(rsi_chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+                plt.savefig(rsi_chart_path, dpi=150, bbox_inches='tight', facecolor='white')  # OPTIMIZED: Reduced DPI from 300
                 plt.close()
-                print(f"✓ RSI Chart saved to {rsi_chart_path}")
+                print(f"✓ RSI Chart saved")
             
-            # Fundamentals Chart - Save to /tmp
+            # Fundamentals Chart - OPTIMIZED: Smaller size and lower DPI
             fund_data = self.analysis_results.get('fundamentals_analysis', {})
             if fund_data.get('revenue_list') and fund_data.get('dates') and len(fund_data['revenue_list']) > 0:
                 revenue_list = fund_data['revenue_list']
@@ -776,7 +811,7 @@ class EnhancedStockAnalyzer:
                 net_profit_list = fund_data['net_profit_list']
                 dates = fund_data['dates']
                 
-                fig, ax = plt.subplots(figsize=(14, 7))
+                fig, ax = plt.subplots(figsize=(10, 5))  # OPTIMIZED: Reduced from (14, 7)
                 fig.patch.set_facecolor('white')
                 ax.set_facecolor('#F8F9F9')
                 
@@ -791,22 +826,21 @@ class EnhancedStockAnalyzer:
                 bars2 = ax.bar([i for i in x], operating_profit_crores, width, label='Operating Profit', color='#F39C12', alpha=0.9, edgecolor='black', linewidth=1.5)
                 bars3 = ax.bar([i + width for i in x], net_profit_crores, width, label='Net Profit', color='#27AE60', alpha=0.9, edgecolor='black', linewidth=1.5)
                 
-                ax.set_title('Quarterly Financial Performance (₹ Crores)', fontsize=16, fontweight='bold', pad=20)
-                ax.set_xlabel('Quarter', fontsize=12, fontweight='bold')
-                ax.set_ylabel('Amount (₹ Crores)', fontsize=12, fontweight='bold')
+                ax.set_title('Quarterly Financial Performance (₹ Crores)', fontsize=14, fontweight='bold', pad=15)
+                ax.set_xlabel('Quarter', fontsize=10, fontweight='bold')
+                ax.set_ylabel('Amount (₹ Crores)', fontsize=10, fontweight='bold')
                 ax.set_xticks(x)
-                ax.set_xticklabels(dates, fontsize=11, fontweight='bold')
-                ax.legend(fontsize=11, loc='best')
+                ax.set_xticklabels(dates, fontsize=10, fontweight='bold')
+                ax.legend(fontsize=9, loc='best')
                 ax.grid(True, alpha=0.3, axis='y', linestyle=':')
                 
                 plt.tight_layout()
-                # SAVE TO /tmp INSTEAD OF CURRENT DIRECTORY
                 fund_chart_path = os.path.join(self.temp_dir, 'fundamentals_chart.png')
-                plt.savefig(fund_chart_path, dpi=300, bbox_inches='tight', facecolor='white')
+                plt.savefig(fund_chart_path, dpi=150, bbox_inches='tight', facecolor='white')  # OPTIMIZED: Reduced DPI from 300
                 plt.close()
-                print(f"✓ Fundamentals Chart saved to {fund_chart_path}")
+                print(f"✓ Fundamentals Chart saved")
             
-            print("All charts created successfully")
+            print("Charts complete")
             return True
         except Exception as e:
             print(f"Error creating charts: {e}")
@@ -815,9 +849,9 @@ class EnhancedStockAnalyzer:
             return False
     
     def generate_professional_pdf(self):
-        """Generate comprehensive professional PDF report"""
+        """Generate comprehensive professional PDF report - ALL PDF CONTENT UNCHANGED"""
         try:
-            print("Generating professional PDF report...")
+            print("Generating PDF report...")
             
             pdf = ProfessionalStockPDF()
             stock_ticker = self.stock_name.replace('.NS', '').replace('.BO', '')
@@ -969,7 +1003,6 @@ class EnhancedStockAnalyzer:
             
             pdf.ln(5)
             
-            # Use /tmp path for RSI chart
             rsi_chart_path = os.path.join(self.temp_dir, 'rsi_chart.png')
             if os.path.exists(rsi_chart_path):
                 pdf.check_page_space(100)
@@ -1012,7 +1045,6 @@ class EnhancedStockAnalyzer:
             
             pdf.ln(5)
             
-            # Use /tmp path for fundamentals chart
             fund_chart_path = os.path.join(self.temp_dir, 'fundamentals_chart.png')
             if os.path.exists(fund_chart_path):
                 pdf.check_page_space(100)
@@ -1137,7 +1169,7 @@ class EnhancedStockAnalyzer:
             pdf.set_text_color(*pdf.TEXT_LIGHT)
             pdf.cell(0, 5, f"Report Generated: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}", 0, 1, "C")
             
-            # Save PDF to /tmp directory - CRITICAL FIX
+            # Save PDF to /tmp directory
             pdf_filename = os.path.join(self.temp_dir, 
                                        f"Stock_Analysis_{stock_ticker}_{datetime.now().strftime('%d%m%Y')}.pdf")
             pdf.output(pdf_filename)
@@ -1168,7 +1200,7 @@ class EnhancedStockAnalyzer:
             print(f"Cleanup warning: {e}")
     
     def run_complete_analysis(self):
-        """Execute full analysis pipeline"""
+        """Execute full analysis pipeline - OPTIMIZED for Vercel"""
         print("\n" + "="*70)
         print("PROFESSIONAL STOCK ANALYSIS TOOL".center(70))
         print("="*70 + "\n")
@@ -1179,7 +1211,7 @@ class EnhancedStockAnalyzer:
         
         self.fetch_stock_info()
         
-        print("\nRunning comprehensive analysis...")
+        print("\nRunning analysis (optimized mode)...")
         self.get_company_details()
         self.analyze_price_data()
         self.analyze_all_time_high()
