@@ -5,3 +5,4 @@ matplotlib==3.8.2
 fpdf==1.7.2
 requests==2.31.0
 Werkzeug==3.0.1
+gunicorn==21.2.0
